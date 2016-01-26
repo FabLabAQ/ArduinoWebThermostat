@@ -19,11 +19,11 @@
  ******************************************************************************/
 
 //----------- Pin Definitions -----------
-#define ENABLE_DEBUG
-#define ONE_WIRE_BUS_PIN 8
+//#define ENABLE_DEBUG
+#define ONE_WIRE_BUS_PIN 2
 #define ZONE_01_PIN 9
 #define THERM_RESOLUTION 10       // 10: 0.25 °C, 9: 0.5 °C
-const float THERM_RANGE = 50;            // 0.50 °C
+const float THERM_RANGE = 0.50;            // 0.50 °C
 const float THERM_INCREMENTS = 0.25;       // 0.25 °C
 
 //----------- One Wire bus initialization and probes addresses ------------
@@ -134,7 +134,7 @@ void loop()
   char connection_buffer[64];
   int buffer_lenght = 64;
   webserver.processConnection(connection_buffer, &buffer_lenght);
-  if (millis()>prevMillis+1000)
+  if (millis() > prevMillis+1000)
   {
     zone01.run();
     prevMillis = millis();
