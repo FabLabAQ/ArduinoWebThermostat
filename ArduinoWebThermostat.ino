@@ -19,11 +19,12 @@
  ******************************************************************************/
 
 //----------- Pin Definitions -----------
-#define ONE_WIRE_BUS_PIN 2
-#define ZONE_01_PIN 13
+#define ENABLE_DEBUG
+#define ONE_WIRE_BUS_PIN 8
+#define ZONE_01_PIN 9
 #define THERM_RESOLUTION 10       // 10: 0.25 °C, 9: 0.5 °C
-#define THERM_RANGE 50            // 0.50 °C
-#define THERM_INCREMENTS 25       // 0.25 °C
+const float THERM_RANGE = 50;            // 0.50 °C
+const float THERM_INCREMENTS = 0.25;       // 0.25 °C
 
 //----------- One Wire bus initialization and probes addresses ------------
 #include "OneWire.h"
@@ -38,7 +39,7 @@ DeviceAddress Probe01 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };
 #define WEBDUINO_AUTH_REALM "Arduino Ethernet Thermostat"
 #include "WebServer.h"
 static uint8_t arduino_mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-static uint8_t arduino_ip[] = { 192, 168, 0, 208 };
+static uint8_t arduino_ip[] = { 192, 168, 0, 127 };
 #define WEBDUINO_PREFIX "/thermostat"
 WebServer webserver(WEBDUINO_PREFIX, 80);
 #define WEBDUINO_CREDENTIALS "YWRtaW46YWRtaW4="
@@ -46,21 +47,29 @@ WebServer webserver(WEBDUINO_PREFIX, 80);
 #include "thermostat.h"
 thermostat zone01(ZONE_01_PIN, temp_sensors, Probe01, THERM_RESOLUTION, THERM_RANGE);
 
+unsigned long prevMillis;
+
 void thermostat_page(WebServer &webserver, WebServer::ConnectionType type, char *, bool)
 {
   if (type == WebServer::POST)
   {
     bool repeat;
-    char name[10], value[1];
+    char name[11], value[2];
     do
     {
-      repeat = webserver.readPOSTparam(name, 16, value, 16);
+      repeat = webserver.readPOSTparam(name, 11, value, 2);
       if (strcmp(name, "thermostat") == 0)
       {
-        if (!strcmp(value, "+"))
+        if (strcmp(value, "+") == 0)
+        {
           zone01.increase_temp(THERM_INCREMENTS);
-        else if (!strcmp(value, "-"))
+          Serial.println("increase_temp");
+        }
+        else if (strcmp(value, "-") == 0)
+        {
           zone01.decrease_temp(THERM_INCREMENTS);
+          Serial.println("decrease_temp");
+        }
       }
     } while (repeat);
     webserver.httpSeeOther(WEBDUINO_PREFIX);
@@ -77,9 +86,9 @@ void thermostat_page(WebServer &webserver, WebServer::ConnectionType type, char 
       else webserver.print("OFF");
       webserver.print("</b><br>actual temp: <b>");
       webserver.print(zone01.get_actual_temp());
-      webserver.print("&deg;C</b><br><form action='/thermostat' method='POST'>set: <button name='zone01' value='-'><b>-</b></button> ");
+      webserver.print("&deg;C</b><br><form action='/thermostat' method='POST'>set: <button name='thermostat' value='-'><b>-</b></button> ");
       webserver.print(zone01.get_temp());
-      webserver.print("&deg;C <button name='zone01' value='+'><b>+</b></button></form></span></body></html>");
+      webserver.print("&deg;C <button name='thermostat' value='+'><b>+</b></button></form></span></body></html>");
     }
   }
   else
@@ -90,11 +99,34 @@ void thermostat_page(WebServer &webserver, WebServer::ConnectionType type, char 
 
 void setup()
 {
+  #ifdef ENABLE_DEBUG
+  Serial.begin(9600);
+  Serial.println("Starting");
+  #endif
   temp_sensors.begin();
-  zone01.set_temp(20.00);
+  #ifdef ENABLE_DEBUG
+  Serial.println("temp_sensors initialization");
+  #endif
+  zone01.begin();
+  #ifdef ENABLE_DEBUG
+  Serial.println("zone01 initialization");
+  #endif
+  zone01.set_temp(20.50);
+  #ifdef ENABLE_DEBUG
+  Serial.println("zone01 set_temp");
+  #endif
   Ethernet.begin(arduino_mac, arduino_ip);
+  #ifdef ENABLE_DEBUG
+  Serial.println("Ethernet initialization");
+  #endif
   webserver.setDefaultCommand(&thermostat_page);
+  #ifdef ENABLE_DEBUG
+  Serial.println("WebServer setDefaultCommand");
+  #endif
   webserver.begin();
+  #ifdef ENABLE_DEBUG
+  Serial.println("WebServer begin");
+  #endif
 }
 
 void loop()
@@ -102,5 +134,12 @@ void loop()
   char connection_buffer[64];
   int buffer_lenght = 64;
   webserver.processConnection(connection_buffer, &buffer_lenght);
-  zone01.run();
+  if (millis()>prevMillis+1000)
+  {
+    zone01.run();
+    prevMillis = millis();
+    #ifdef ENABLE_DEBUG
+    Serial.println("zone01 run");
+    #endif
+  }
 }
