@@ -7,7 +7,7 @@
 class thermostat
 {
 	public:
-		thermostat(uint8_t pin, DallasTemperature*, DeviceAddress*, uint8_t, uint8_t);
+		thermostat(uint8_t pin, DallasTemperature&, DeviceAddress&, uint8_t, uint8_t);
 		void run();
 		float get_temp();
 		float get_actual_temp();
@@ -19,8 +19,8 @@ class thermostat
 		uint8_t _pin, _resolution, _range;
 		float _temp, _actual_temp, _increase, _decrease;
 		//bool _status;
-		DallasTemperature *_temp_sensors;
-		DeviceAddress *_probe_address;
+		DallasTemperature _temp_sensors;
+		DeviceAddress _probe_address;
 };
 
 #endif

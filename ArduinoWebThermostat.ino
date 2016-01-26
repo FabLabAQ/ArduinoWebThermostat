@@ -58,9 +58,9 @@ void thermostat_page(WebServer &webserver, WebServer::ConnectionType type, char 
       if (strcmp(name, "thermostat") == 0)
       {
         if (!strcmp(value, "+"))
-          thermostat.increase(THERM_INCREMENTS);
+          zone01.increase_temp(THERM_INCREMENTS);
         else if (!strcmp(value, "-"))
-          thermostat.decrease(THERM_INCREMENTS);
+          zone01.decrease_temp(THERM_INCREMENTS);
       }
     } while (repeat);
     webserver.httpSeeOther(WEBDUINO_PREFIX);

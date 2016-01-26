@@ -2,14 +2,14 @@
 #include "DallasTemperature.h"
 #include "Arduino.h"
 
-thermostat::thermostat(uint8_t pin, DallasTemperature *temp_sensors, DeviceAddress *probe_address, uint8_t resolution, uint8_t range)
+thermostat::thermostat(uint8_t pin, DallasTemperature &temp_sensors, DeviceAddress &probe_address, uint8_t resolution, uint8_t range)
 {
 	_pin = pin;
 	_temp_sensors = temp_sensors;
 	_probe_address = probe_address;
 	_resolution = resolution;
 	_range = range;
-	_status = false;
+	//_status = false;
 
 	pinMode(_pin, OUTPUT);
 	_temp_sensors.setResolution(_probe_address, _resolution);
