@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title>Arduino Web Thermostat</title>
+	<body>
+		<span style="font-family: verdana; font-size: 16px; color: #000000;">
+			<b>Arduino Web Thermostat</b><br><br>
+
+				<b>Zone 01 ON</b>
+				<br>
+				actual temp: <b>20.0&deg;C</b>
+				<br>
+				<form action='/thermostat' method='POST'>
+					set: <button name='zone01' value='-'><b>-</b></button> 21.0&deg;C <button name='zone01' value='+'><b>+</b></button>
+				</form>
+
+				<b>Zone 02 OFF</b>
+				<br>
+				actual temp: <b>21.0&deg;C</b>
+				<br>
+				<form action='/thermostat' method='POST'>
+					set: <button name='zone02' value='-'><b>-</b></button> 20.0&deg;C <button name='zone02' value='+'><b>+</b></button>
+				</form>
+
+		</span>
+	</body>
+</html>

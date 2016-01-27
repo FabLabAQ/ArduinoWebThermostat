@@ -19,21 +19,21 @@
  ******************************************************************************/
 
 //----------- Pin and Constants Definitions -----------
-// #define ENABLE_DEBUG
-#define ONE_WIRE_BUS_PIN 2
-#define ZONE_01_PIN 6
-#define ZONE_02_PIN 7
-#define ZONE_03_PIN 8
-#define ZONE_04_PIN 9
-#define THERM_RESOLUTION 10       // 10: 0.25 °C, 9: 0.5 °C
-const uint8_t THERM_RANGE = 25;            // 0.50 °C
-const uint8_t THERM_INCREMENTS = 50;       // 0.25 °C
+//#define ENABLE_DEBUG
+const uint8_t ONE_WIRE_BUS_PIN = 2;
+const uint8_t ZONE_01_PIN = 6;                         // pin connected to the relay
+const uint8_t ZONE_02_PIN = 7;
+const uint8_t ZONE_03_PIN = 8;
+const uint8_t ZONE_04_PIN = 9;
+const uint8_t THERM_RESOLUTION = 10;                   // 9=0.5°C, 10=0.25°C, 11=0.125°C, 12=1/16°C resolution of the temperature probes readings
+const uint8_t THERM_RANGE = 25;                        // 0.25 °C, the range around the actual temperature in which the thermostat will be acting
+const uint8_t THERM_INCREMENTS = 50;                   // 0.50 °C, the increment in set temperature when clicking on + or -
 
 //----------- One Wire bus declaration and probes addresses ------------
 #include "OneWire.h"
 #include "DallasTemperature.h"
 OneWire oneWire(ONE_WIRE_BUS_PIN);
-DallasTemperature *temp_sensors = new DallasTemperature(&oneWire);
+DallasTemperature *temp_sensors = new DallasTemperature(&oneWire);              // poiter to the temperature sensors manager, to be passed in to the thermostat objects, requires OneWire object
 DeviceAddress probe01 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };
 DeviceAddress probe02 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };
 DeviceAddress probe03 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };
@@ -42,22 +42,24 @@ DeviceAddress probe04 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };
 //--------- Web initialization ----------
 #include "SPI.h"
 #include "Ethernet.h"
-#define WEBDUINO_AUTH_REALM "Arduino Ethernet Thermostat"
+#define WEBDUINO_AUTH_REALM "Arduino Ethernet Thermostat"                   // message shown at the web authentication prompt
 #include "WebServer.h"
-static uint8_t arduino_mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-static uint8_t arduino_ip[] = { 192, 168, 0, 127 };
-#define WEBDUINO_PREFIX "/thermostat"
-WebServer webserver(WEBDUINO_PREFIX, 80);
-#define WEBDUINO_CREDENTIALS "YWRtaW46YWRtaW4="
+static uint8_t arduino_mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };      // set the ethernet shield MAC address here
+static uint8_t arduino_ip[] = { 192, 168, 0, 127 };                         // set the static IP address here
+#define WEBDUINO_PREFIX "/thermostat"                                       // the page will be available at: http://192.168.0.127/thermostat
+WebServer webserver(WEBDUINO_PREFIX, 80);                                   // webserver object declaration with listening port (80)
+#define WEBDUINO_CREDENTIALS "YWRtaW46YWRtaW4="                             // admin:admin username and password pair, encoded in base64
 
-#include "thermostat.h"
-thermostat zone01(ZONE_01_PIN, temp_sensors, probe01, THERM_RESOLUTION, THERM_RANGE);
-thermostat zone02(ZONE_02_PIN, temp_sensors, probe02, THERM_RESOLUTION, THERM_RANGE);
-thermostat zone03(ZONE_03_PIN, temp_sensors, probe03, THERM_RESOLUTION, THERM_RANGE);
-thermostat zone04(ZONE_04_PIN, temp_sensors, probe04, THERM_RESOLUTION, THERM_RANGE);
+//-------------------------- Thermostat objects declaration -------------------------
+#include "thermostat.h"                                                                   // thermostat class
+thermostat zone01(ZONE_01_PIN, temp_sensors, probe01, THERM_RESOLUTION, THERM_RANGE);     // parameters passed to the constructor: 
+thermostat zone02(ZONE_02_PIN, temp_sensors, probe02, THERM_RESOLUTION, THERM_RANGE);     // pin connected to the relay, temperature sensors object pointer, probe address, desired reading resolution, activation temperature range,
+thermostat zone03(ZONE_03_PIN, temp_sensors, probe03, THERM_RESOLUTION, THERM_RANGE);     // e.g. when measured temp goes under (set_temp - range) the thermostat will be activated,
+thermostat zone04(ZONE_04_PIN, temp_sensors, probe04, THERM_RESOLUTION, THERM_RANGE);     // when measured temp goes over (set_temp + range) the thermostat will be deactivated
 
-unsigned long prevMillis;
+unsigned long prevMillis;       // variable to store time elapsed since the last time thermostats were updated
 
+//------------------------------ thermostat html page and POST handler routine ------------------------------------
 void thermostat_page(WebServer &webserver, WebServer::ConnectionType type, char *, bool)
 {
   if (type == WebServer::POST)
@@ -107,14 +109,14 @@ void thermostat_page(WebServer &webserver, WebServer::ConnectionType type, char 
         {
           zone03.increase_temp(THERM_INCREMENTS);
           #ifdef ENABLE_DEBUG
-          Serial.println("zone02 increase_temp");
+          Serial.println("zone03 increase_temp");
           #endif
         }
         else if (!strcmp(value, "-"))
         {
           zone03.decrease_temp(THERM_INCREMENTS);
           #ifdef ENABLE_DEBUG
-          Serial.println("zone02 decrease_temp");
+          Serial.println("zone03 decrease_temp");
           #endif
         }
       }
@@ -124,14 +126,14 @@ void thermostat_page(WebServer &webserver, WebServer::ConnectionType type, char 
         {
           zone04.increase_temp(THERM_INCREMENTS);
           #ifdef ENABLE_DEBUG
-          Serial.println("zone02 increase_temp");
+          Serial.println("zone04 increase_temp");
           #endif
         }
         else if (!strcmp(value, "-"))
         {
           zone04.decrease_temp(THERM_INCREMENTS);
           #ifdef ENABLE_DEBUG
-          Serial.println("zone02 decrease_temp");
+          Serial.println("zone04 decrease_temp");
           #endif
         }
       }
