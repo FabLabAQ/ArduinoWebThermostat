@@ -23,7 +23,7 @@
 #include "DallasTemperature.h"
 #include "Arduino.h"
 
-thermostat::thermostat(uint8_t pin, DallasTemperature &temp_sensors, DeviceAddress &probe_address, uint8_t resolution, float range)
+thermostat::thermostat(uint8_t pin, DallasTemperature *temp_sensors, DeviceAddress &probe_address, uint8_t resolution, uint8_t range)
 {
 	_pin = pin;
 	_temp_sensors = temp_sensors;
@@ -37,34 +37,34 @@ thermostat::thermostat(uint8_t pin, DallasTemperature &temp_sensors, DeviceAddre
 void thermostat::begin()
 {
 	pinMode(_pin, OUTPUT);
-	_temp_sensors.setResolution(_probe_address, _resolution);
+	_temp_sensors->begin();
+	_temp_sensors->setResolution(_probe_address, _resolution);
 }
 
 void thermostat::set_temp(float temp)
 {
-	_temp = temp;
+	_temp = temp * 100;
 }
 
-void thermostat::increase_temp(float increase)
+void thermostat::increase_temp(uint8_t increase)
 {
 	_temp += increase;
 }
 
-void thermostat::decrease_temp(float decrease)
+void thermostat::decrease_temp(uint8_t decrease)
 {
 	_temp -= decrease;
 }
 
 float thermostat::get_temp()
 {
-	return _temp;
+	return _temp / 100.0;
 }
 
 float thermostat::get_actual_temp()
 {
-	_temp_sensors.requestTemperatures();
-	_actual_temp = _temp_sensors.getTempC(_probe_address);
-	return _actual_temp;
+	_temp_sensors->requestTemperaturesByAddress(_probe_address);
+	return _temp_sensors->getTempC(_probe_address);
 }
 
 bool thermostat::get_status()
@@ -74,7 +74,8 @@ bool thermostat::get_status()
 
 void thermostat::run()
 {
-	thermostat::get_actual_temp();
+	_actual_temp = this->get_actual_temp() * 100;
+
 	if(_actual_temp > (_temp + _range))
 	{
 		digitalWrite(_pin, LOW);
