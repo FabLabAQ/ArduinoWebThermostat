@@ -103,7 +103,7 @@ void thermostat_page_cmd(WebServer &webserver, WebServer::ConnectionType type, c
     {
       repeat = webserver.readPOSTparam(name, 2, value, 2);
 
-      int i = atoi(name);
+      uint8_t i = name[0] - 48;
 
       if (!strcmp(value, "+"))
         {
