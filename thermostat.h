@@ -27,7 +27,7 @@
 class thermostat
 {
 	public:
-		thermostat(uint8_t pin, DallasTemperature *temp_sensors, DeviceAddress &probe_address, uint8_t, uint8_t);
+		thermostat(uint8_t, DallasTemperature*, DeviceAddress, uint8_t, uint8_t);
 		void begin();
 		void run();
 		float get_temp();
