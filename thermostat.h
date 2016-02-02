@@ -24,21 +24,28 @@
 #include "Arduino.h"
 #include "DallasTemperature.h"
 
+#ifndef THERMOSTAT_RESOLUTION
+#define THERMOSTAT_RESOLUTION 9
+#endif // #ifndef THERMOSTAT_RESOLUTION
+
+#ifndef THERMOSTAT_RANGE
+#define THERMOSTAT_RANGE 1
+#endif // #ifndef THERMOSTAT_RANGE
+
 class thermostat
 {
 	public:
-		thermostat(uint8_t, DallasTemperature*, DeviceAddress, uint8_t, uint8_t);
+		thermostat(uint8_t, DallasTemperature*, DeviceAddress, uint8_t);
 		void begin();
 		void run();
-		float get_temp();
+		float get_set_temp();
 		float get_actual_temp();
-		void set_temp(float);
+//		void set_temp(uint8_t);
 		bool get_status();
-		void increase_temp(uint8_t);
-		void decrease_temp(uint8_t);
+		void change_temp(int8_t);
 	private:
-		uint8_t _pin, _resolution, _range;
-		int _temp, _actual_temp;
+		const uint8_t _resolution = THERMOSTAT_RESOLUTION, _range = THERMOSTAT_RANGE;
+		uint8_t _pin, _eeprom_address, _temp, _actual_temp;
 		bool _status;
 		DallasTemperature *_temp_sensors;
 		DeviceAddress _probe_address;

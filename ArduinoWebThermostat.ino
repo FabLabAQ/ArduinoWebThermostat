@@ -21,59 +21,83 @@
 //----------- Pin and Constants Definitions -----------
 //#define ENABLE_DEBUG
 const uint8_t ONE_WIRE_BUS_PIN = 2;                    // pin connected to the temperature probes
-const uint8_t ZONE_01_PIN = 6;                         // pin connected to the relay
-const uint8_t ZONE_02_PIN = 7;
-const uint8_t ZONE_03_PIN = 8;
-const uint8_t ZONE_04_PIN = 9;
-const uint8_t THERM_RESOLUTION = 10;                   // 9=0.5°C, 10=0.25°C, 11=0.125°C, 12=1/16°C resolution of the temperature probes readings
-const uint8_t THERM_RANGE = 25;                        // 0.25 °C, the range around the actual temperature in which the thermostat will be acting
-const uint8_t THERM_INCREMENTS = 50;                   // 0.50 °C, the increment in set temperature when clicking on + or -
+const uint8_t ZONE_0_PIN = 6;                         // pin connected to the relay
+const uint8_t ZONE_1_PIN = 7;
+const uint8_t ZONE_2_PIN = 8;
+const uint8_t ZONE_3_PIN = 9;
+const uint8_t THERM_INCREMENTS = 5;                   // 0.50 °C, the increment in set temperature when clicking on + or -
+const uint8_t eeprom_address_0 = 0;
+const uint8_t eeprom_address_1 = 1;
+const uint8_t eeprom_address_2 = 2;
+const uint8_t eeprom_address_3 = 3;
 
 //----------- One Wire bus declaration and probes addresses ------------
 #include "OneWire.h"
 #include "DallasTemperature.h"
 OneWire oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature *temp_sensors = new DallasTemperature(&oneWire);              // poiter to the temperature sensors object, 
-DeviceAddress probe01 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };     // to be passed in to the thermostat objects, requires OneWire object
-DeviceAddress probe02 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };     // use an address finder sketch to find each probe address
-DeviceAddress probe03 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };
-DeviceAddress probe04 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };
+DeviceAddress probe_0 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };     // to be passed in to the thermostat objects, requires OneWire object
+DeviceAddress probe_1 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };     // use an address finder sketch to find each probe address
+DeviceAddress probe_2 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };
+DeviceAddress probe_3 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };
 
 //--------- Web initialization ----------
+#include <TimeLib.h>
+#include <EthernetUdp.h>
 #include "SPI.h"
 #include "Ethernet.h"
-#define WEBDUINO_AUTH_REALM "Arduino Ethernet Thermostat"                   // message shown at the web authentication prompt
+#define WEBDUINO_AUTH_REALM ""                   // message shown at the web authentication prompt
 #define WEBDUINO_FAVICON_DATA ""
 #include "WebServer.h"
+
 static uint8_t arduino_mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };      // set the ethernet shield MAC address here
 static uint8_t arduino_ip[] = { 192, 168, 0, 127 };                         // set the static IP address here
+//static char ntp_server_address[] = { 193, 204, 114, 233 };                     // time-a.timefreq.bldrdoc.gov
+static char ntp_server_address[] = "ntp2.inrim.it";                        // ntp2.inrim.it
+const int8_t time_zone = 1;
+const uint8_t ntp_port = 123;
+const int NTP_PACKET_SIZE = 48;
+uint8_t ntp_packet_buffer[NTP_PACKET_SIZE];
+
+EthernetUDP udp_conn;
 #define WEBDUINO_PREFIX "/thermostat"                                       // the page will be available at: http://192.168.0.127/thermostat
 WebServer webserver(WEBDUINO_PREFIX, 80);                                   // webserver object declaration with listening port (80)
 #define WEBDUINO_CREDENTIALS "YWRtaW46YWRtaW4="                             // admin:admin username and password pair, encoded in base64
-P(title_str) = "Arduino Web Thermostat";
+// P(title_str) = "Arduino Web Thermostat ";
 
 //-------------------------- Thermostat objects declaration -------------------------     // thermostat class
+#include "EEPROM.h"
+#define THERMOSTAT_RESOLUTION 9                   // 9=0.5°C, 10=0.25°C, 11=0.125°C, 12=1/16°C resolution of the temperature probes readings, default to 9
+#define THERMOSTAT_RANGE 2                        // 0.20 °C, the range around the actual temperature in which the thermostat will be acting, default to 1
 #include "thermostat.h"                                                                   // parameters passed to the constructor:
-thermostat *zone01 = new thermostat(ZONE_01_PIN, temp_sensors, probe01, THERM_RESOLUTION, THERM_RANGE);     // pin connected to the relay, temperature sensors object pointer, 
-thermostat *zone02 = new thermostat(ZONE_02_PIN, temp_sensors, probe02, THERM_RESOLUTION, THERM_RANGE);     // probe address, desired reading resolution, activation temperature range.
-thermostat *zone03 = new thermostat(ZONE_03_PIN, temp_sensors, probe03, THERM_RESOLUTION, THERM_RANGE);     // e.g. when measured temp goes under (set_temp - range) the thermostat will be activated,
-thermostat *zone04 = new thermostat(ZONE_04_PIN, temp_sensors, probe04, THERM_RESOLUTION, THERM_RANGE);     // when measured temp goes over (set_temp + range) the thermostat will be deactivated
-const uint8_t num_zone = 4;
-thermostat *thermostats[num_zone] = { zone01, zone02, zone03, zone04 };
+thermostat *zone_0 = new thermostat(ZONE_0_PIN, temp_sensors, probe_0, eeprom_address_0);     // pin connected to the relay, temperature sensors object pointer, 
+thermostat *zone_1 = new thermostat(ZONE_1_PIN, temp_sensors, probe_1, eeprom_address_1);     // probe address, desired reading resolution, activation temperature range.
+thermostat *zone_2 = new thermostat(ZONE_2_PIN, temp_sensors, probe_2, eeprom_address_2);     // e.g. when measured temp goes under (set_temp - range) the thermostat will be activated,
+thermostat *zone_3 = new thermostat(ZONE_3_PIN, temp_sensors, probe_3, eeprom_address_3);     // when measured temp goes over (set_temp + range) the thermostat will be deactivated
+const uint8_t num_thermostats = 4;
+thermostat *thermostats[num_thermostats] = { zone_0, zone_1, zone_2, zone_3 };
 
 unsigned long prevMillis;       // variable to store time elapsed since the last time thermostats were updated
 
 void print_thermostat_page()
 {
-  webserver.print("<html><head><title>");
-  webserver.printP(title_str);
-  webserver.print("</title><body>");
-  webserver.printP(title_str);
-  webserver.print("<br>");
-
-  for (uint8_t i=0; i<num_zone; i++)
+  webserver.print("<html><head><body>");
+  // webserver.print("<html><head><title>");
+  // webserver.printP(title_str);
+  // webserver.print("</title><body>");
+  // webserver.printP(title_str);
+  webserver.print(hour());
+  webserver.print(":");
+  if (minute() < 10)
   {
-      webserver.print("<br>Zone ");
+    webserver.print("0");
+  }
+  webserver.print(minute());
+  webserver.print("<br><br>");
+
+  for (uint8_t i=0; i<num_thermostats; i++)
+  {
+      webserver.print("Zone ");
       webserver.print(i);
       if(thermostats[i]->get_status())
         webserver.print(" ON");
@@ -83,7 +107,7 @@ void print_thermostat_page()
       webserver.print("&deg;C<br><form action='/thermostat' method='POST'>set: <button name='");
       webserver.print(i);
       webserver.print("' value='-'>-</button> ");
-      webserver.print(thermostats[i]->get_temp());
+      webserver.print(thermostats[i]->get_set_temp());
       webserver.print("&deg;C <button name='");
       webserver.print(i);
       webserver.print("' value='+'>+</button></form>");
@@ -103,15 +127,15 @@ void thermostat_page_cmd(WebServer &webserver, WebServer::ConnectionType type, c
     {
       repeat = webserver.readPOSTparam(name, 2, value, 2);
 
-      uint8_t i = name[0] - 48;
+      uint8_t i = name[0] - '0';
 
-      if (!strcmp(value, "+"))
+      if (value[0] == '+')
         {
-          thermostats[i]->increase_temp(THERM_INCREMENTS);
+          thermostats[i]->change_temp(THERM_INCREMENTS);
         }
-        else if (!strcmp(value, "-"))
+        else if (value[0] == '-')
         {
-          thermostats[i]->decrease_temp(THERM_INCREMENTS);
+          thermostats[i]->change_temp(-THERM_INCREMENTS);
         }
 
     } while (repeat);
@@ -132,16 +156,62 @@ void thermostat_page_cmd(WebServer &webserver, WebServer::ConnectionType type, c
   }
 }
 
+time_t getNtpTime()
+{
+  while (udp_conn.parsePacket() > 0) ; // discard any previously received packets
+  sendNTPpacket(ntp_server_address);
+  uint32_t beginWait = millis();
+  while (millis() - beginWait < 1500) {
+    int size = udp_conn.parsePacket();
+    if (size >= NTP_PACKET_SIZE) {
+      udp_conn.read(ntp_packet_buffer, NTP_PACKET_SIZE);  // read packet into the buffer
+      unsigned long secsSince1900; // convert four bytes starting at location 40 to a long integer
+      secsSince1900 =  (unsigned long)ntp_packet_buffer[40] << 24;
+      secsSince1900 |= (unsigned long)ntp_packet_buffer[41] << 16;
+      secsSince1900 |= (unsigned long)ntp_packet_buffer[42] << 8;
+      secsSince1900 |= (unsigned long)ntp_packet_buffer[43];
+      return secsSince1900 - 2208988800UL + time_zone * SECS_PER_HOUR;
+    }
+  }
+  return 0; // return 0 if unable to get the time
+}
+
+void sendNTPpacket(char* address)    // send an NTP request to the time server at the given address
+{
+  // set all bytes in the buffer to 0
+  memset(ntp_packet_buffer, 0, NTP_PACKET_SIZE);
+  // Initialize values needed to form NTP request
+  // (see URL above for details on the packets)
+  ntp_packet_buffer[0] = 0b11100011;   // LI, Version, Mode
+  ntp_packet_buffer[1] = 0;     // Stratum, or type of clock
+  ntp_packet_buffer[2] = 6;     // Polling Interval
+  ntp_packet_buffer[3] = 0xEC;  // Peer Clock Precision
+  // 8 bytes of zero for Root Delay & Root Dispersion
+  ntp_packet_buffer[12]  = 49;
+  ntp_packet_buffer[13]  = 0x4E;
+  ntp_packet_buffer[14]  = 49;
+  ntp_packet_buffer[15]  = 52;
+  // all NTP fields have been given values, now
+  // you can send a packet requesting a timestamp:                 
+  udp_conn.beginPacket(address, ntp_port); //NTP requests are to port 123
+  udp_conn.write(ntp_packet_buffer, NTP_PACKET_SIZE);
+  udp_conn.endPacket();
+}
+
 void setup()
 {
-  for (uint8_t i=0; i<num_zone; i++)
+  Ethernet.begin(arduino_mac, arduino_ip);
+  temp_sensors->begin();
+  for (uint8_t i=0; i<num_thermostats; i++)
     {
       thermostats[i]->begin();
-      thermostats[i]->set_temp(20.00);
+      // thermostats[i]->set_temp(200);
     }
-  Ethernet.begin(arduino_mac, arduino_ip);
   webserver.setDefaultCommand(& thermostat_page_cmd);
   webserver.begin();
+  udp_conn.begin(ntp_port);
+  while (getNtpTime() == 0);      // to prevent unwanted activation
+  setSyncProvider(getNtpTime);
 }
 
 void loop()
@@ -151,10 +221,11 @@ void loop()
   webserver.processConnection(connection_buffer, &buffer_lenght);
   if (millis() > prevMillis+1000)
   {
-    for (uint8_t i=0; i<num_zone; i++)
+    for (uint8_t i=0; i<num_thermostats; i++)
     {
       thermostats[i]->run();
     }
     prevMillis = millis();
   }
+
 }
