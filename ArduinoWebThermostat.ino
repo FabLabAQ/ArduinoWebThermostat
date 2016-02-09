@@ -27,9 +27,9 @@ const uint8_t ZONE_2_PIN = 8;
 const uint8_t ZONE_3_PIN = 9;
 const uint8_t THERM_INCREMENTS = 5;                   // 0.50 °C, the increment in set temperature when clicking on + or -
 const uint8_t eeprom_address_0 = 0;
-const uint8_t eeprom_address_1 = 1;
-const uint8_t eeprom_address_2 = 2;
-const uint8_t eeprom_address_3 = 3;
+const uint8_t eeprom_address_1 = 3;
+const uint8_t eeprom_address_2 = 6;
+const uint8_t eeprom_address_3 = 9;
 
 //----------- One Wire bus declaration and probes addresses ------------
 #include "OneWire.h"
@@ -42,18 +42,18 @@ DeviceAddress probe_2 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };
 DeviceAddress probe_3 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };
 
 //--------- Web initialization ----------
-#include <TimeLib.h>
-#include <EthernetUdp.h>
+#include "TimeLib.h"
 #include "SPI.h"
 #include "Ethernet.h"
+#include "EthernetUdp.h"
 #define WEBDUINO_AUTH_REALM ""                   // message shown at the web authentication prompt
 #define WEBDUINO_FAVICON_DATA ""
 #include "WebServer.h"
 
 static uint8_t arduino_mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };      // set the ethernet shield MAC address here
 static uint8_t arduino_ip[] = { 192, 168, 0, 127 };                         // set the static IP address here
-//static char ntp_server_address[] = { 193, 204, 114, 233 };                     // time-a.timefreq.bldrdoc.gov
-static char ntp_server_address[] = "ntp2.inrim.it";                        // ntp2.inrim.it
+//static char ntp_server_address[] = { 62, 149, 204, 69 };                     // ntp.inrim.it
+static char ntp_server_address[] = "ntp.ien.it";                        // ntp2.inrim.it
 const int8_t time_zone = 1;
 const uint8_t ntp_port = 123;
 const int NTP_PACKET_SIZE = 48;
@@ -81,6 +81,9 @@ unsigned long prevMillis;       // variable to store time elapsed since the last
 
 void print_thermostat_page()
 {
+  P(degC) = "&deg;C";
+  P(br) = "<br>";
+
   webserver.print("<html><head><body>");
   // webserver.print("<html><head><title>");
   // webserver.printP(title_str);
@@ -93,24 +96,53 @@ void print_thermostat_page()
     webserver.print("0");
   }
   webserver.print(minute());
-  webserver.print("<br><br>");
+
+  webserver.printP(br);
+  webserver.printP(br);
 
   for (uint8_t i=0; i<num_thermostats; i++)
   {
+      char name = i + '0';
+
       webserver.print("Zone ");
       webserver.print(i);
       if(thermostats[i]->get_status())
         webserver.print(" ON");
       else webserver.print(" OFF");
-      webserver.print("<br>actual temp: ");
+      
+      webserver.printP(br);
+
+      webserver.print("actual temp: ");
       webserver.print(thermostats[i]->get_actual_temp());
-      webserver.print("&deg;C<br><form action='/thermostat' method='POST'>set: <button name='");
-      webserver.print(i);
-      webserver.print("' value='-'>-</button> ");
+      webserver.printP(degC);
+
+      webserver.printP(br);
+
+      P(form_start) = "<form action='/thermostat' method='POST'>set: ";
+      webserver.printP(form_start);
+
+      webserver.print_button(name, "-", "-");
       webserver.print(thermostats[i]->get_set_temp());
-      webserver.print("&deg;C <button name='");
-      webserver.print(i);
-      webserver.print("' value='+'>+</button></form>");
+      webserver.printP(degC);
+      webserver.print_button(name, "+", "+");
+
+      webserver.printP(br);
+
+      webserver.print(" on hour: ");
+      webserver.print_button(name, "0", "-");
+      webserver.print(thermostats[i]->get_on_hour());
+      webserver.print(":00 ");
+      webserver.print_button(name, "1", "+");
+
+      webserver.printP(br);
+
+      webserver.print("off hour: ");
+      webserver.print_button(name, "2", "-");
+      webserver.print(thermostats[i]->get_off_hour());
+      webserver.print(":00 ");
+      webserver.print_button(name, "3", "+");
+
+      webserver.print("</form>");
   }
 
   webserver.print("</body></html>");
@@ -123,25 +155,31 @@ void thermostat_page_cmd(WebServer &webserver, WebServer::ConnectionType type, c
   {
     bool repeat;
     char name[2], value[2];
+
     do
     {
       repeat = webserver.readPOSTparam(name, 2, value, 2);
 
       uint8_t i = name[0] - '0';
 
-      if (value[0] == '+')
-        {
-          thermostats[i]->change_temp(THERM_INCREMENTS);
-        }
-        else if (value[0] == '-')
-        {
-          thermostats[i]->change_temp(-THERM_INCREMENTS);
-        }
+      switch (value[0])
+      {
+          case ('+'): thermostats[i]->change_temp(THERM_INCREMENTS); break;
+          case ('-'): thermostats[i]->change_temp(-THERM_INCREMENTS); break;
+          case ('0'): thermostats[i]->change_on_hour(-1); break;
+          case ('1'): thermostats[i]->change_on_hour(1); break;
+          case ('2'): thermostats[i]->change_off_hour(-1); break;
+          case ('3'): thermostats[i]->change_off_hour(1); break;
+          default: break;
+      }
 
     } while (repeat);
+
     webserver.httpSeeOther(WEBDUINO_PREFIX);
+
     return;
   }
+
   if (webserver.checkCredentials(WEBDUINO_CREDENTIALS))
   {
     webserver.httpSuccess();
@@ -156,7 +194,7 @@ void thermostat_page_cmd(WebServer &webserver, WebServer::ConnectionType type, c
   }
 }
 
-time_t getNtpTime()
+time_t getNTPtime()
 {
   while (udp_conn.parsePacket() > 0) ; // discard any previously received packets
   sendNTPpacket(ntp_server_address);
@@ -210,8 +248,11 @@ void setup()
   webserver.setDefaultCommand(& thermostat_page_cmd);
   webserver.begin();
   udp_conn.begin(ntp_port);
-  while (getNtpTime() == 0);      // to prevent unwanted activation
-  setSyncProvider(getNtpTime);
+  while (getNTPtime() == 0)      // to prevent unwanted activation based on wrong time
+  {
+    delay(1000);
+  }
+  setSyncProvider(getNTPtime);
 }
 
 void loop()
@@ -219,6 +260,7 @@ void loop()
   char connection_buffer[64];
   int buffer_lenght = 64;
   webserver.processConnection(connection_buffer, &buffer_lenght);
+  
   if (millis() > prevMillis+1000)
   {
     for (uint8_t i=0; i<num_thermostats; i++)
