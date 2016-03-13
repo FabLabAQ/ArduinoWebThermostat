@@ -24,7 +24,11 @@
 #include "Ethernet.h"
 #include "OneWire.h"
 
+uint8_t ntp_packet_buffer[NTP_PACKET_SIZE];
 int8_t thermostat_day[num_thermostats];
+bool heater_status = false, cooler_status = false;
+
+WebServer webserver(WEBDUINO_PREFIX, LISTENING_PORT);			// webserver object declaration with listening port (80)
 
 void print_thermostat_page()
 {
@@ -41,6 +45,20 @@ void print_thermostat_page()
 		webserver.print("0");
 	}
 	webserver.print(minute());
+
+	webserver.printP(br);
+
+	webserver.printP(heater_str);
+	if(heater_status)
+		webserver.printP(on_str);
+		else webserver.printP(off_str);
+
+	webserver.printP(br);
+
+	webserver.printP(cooler_str);
+	if(cooler_status)
+		webserver.printP(on_str);
+		else webserver.printP(off_str);
 
 	webserver.printP(br);
 	webserver.printP(br);
@@ -205,6 +223,10 @@ void sendNTPpacket(char* address)		// send an NTP request to the time server at 
 
 void setup()
 {
+	pinMode(HEATER_PIN, OUTPUT);
+	digitalWrite(HEATER_PIN, !heater_status);
+	pinMode(COOLER_PIN, OUTPUT);
+	digitalWrite(COOLER_PIN, !cooler_status);
 	Ethernet.begin(arduino_mac, arduino_ip);
 	temp_sensors->begin();
 	webserver.setDefaultCommand(& thermostat_page_cmd);
@@ -226,6 +248,7 @@ void loop()
 	static unsigned long prevMillis_1, prevMillis_2, prevMillis_3;			 // variable to store time elapsed since the last time thermostats were updated
 	char connection_buffer[64];
 	int buffer_lenght = 64;
+
 	webserver.processConnection(connection_buffer, &buffer_lenght);
 	
 	if (millis() > prevMillis_1 +CHECK_INTERVAL)
@@ -234,6 +257,45 @@ void loop()
 		{
 			thermostats[i]->run();
 		}
+
+		bool control = false;
+
+		for (uint8_t i=0; i<num_thermostats && !control; i++)
+		{
+			if (thermostats[i]->status)
+				control = true;
+		}
+
+		if (control)
+		{	
+			heater_status = false;
+			for (uint8_t i=0; i<num_thermostats && !heater_status; i++)
+			{
+				if (thermostats[i]->mode == 1)
+					heater_status = true;
+			}
+
+			cooler_status = false;
+			for (uint8_t i=0; i<num_thermostats && !cooler_status; i++)
+			{
+				if (thermostats[i]->mode == 2)
+					cooler_status = true;
+			}
+
+			if (heater_status == cooler_status)
+			{
+				heater_status = false;
+				cooler_status = false;
+			}
+		}
+		else
+		{
+			heater_status = false;
+			cooler_status = false;
+		}
+
+		digitalWrite(HEATER_PIN, !heater_status);
+		digitalWrite(COOLER_PIN, !cooler_status);
 		prevMillis_1 = millis();
 	}
 
@@ -249,6 +311,10 @@ void loop()
 
 	if (millis() > prevMillis_3 +HOUR_RESET_INTERVAL)
 	{
+		while (getNTPtime() == 0)			// to prevent unwanted activation based on wrong time
+		{
+			delay(1000);
+		}
 		setSyncProvider(getNTPtime);
 		prevMillis_3 = millis();
 	}

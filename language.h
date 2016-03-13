@@ -31,7 +31,6 @@ P(plus) = "+";
 P(minus) = "-";
 P(right) = ">";
 P(left) = "<";
-
 P(on_str) = " ON";
 P(off_str) = " OFF";
 P(double_zero) = ":00 ";
@@ -41,30 +40,30 @@ P(double_zero) = ":00 ";
 // P(title_str) = "Arduino Web Thermostat ";
 const unsigned char zone_names[4][7] PROGMEM = { "Zone 1", "Zone 2", "Zone 3", "Zone 4" };
 const unsigned char weekday_names[7][4] PROGMEM = { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri" };
-//const unsigned char weekday_names_underlined[7][11] PROGMEM = { "<u>Sat</u>", "<u>Sun</u>", "<u>Mon</u>", "<u>Tue</u>", "<u>Wed</u>", "<u>Thu</u>", "<u>Fri</u>" };
-const unsigned char mode_names[3][8] PROGMEM = { "Winter", "Summer", "Disable" };
-//const unsigned char mode_names_underlined[3][15] PROGMEM = { "<u>Winter</u>", "<u>Summer</u>", "<u>Disable</u>" };
-P(set_temp_str) = "set: ";
-P(actual_temp_str) = "actual temp: ";
+const unsigned char mode_names[3][8] PROGMEM = { "Disable", "Winter", "Summer" };
+P(set_temp_str) = "Set: ";
+P(actual_temp_str) = "Actual temp: ";
 P(on_hour_str) = "ON hour: ";
 P(off_hour_str) = "OFF hour: ";
-P(mode_str) = "mode: ";
-P(day_str) = "day: ";
+P(mode_str) = "Mode: ";
+P(day_str) = "Day: ";
+P(heater_str) = "Heater: ";
+P(cooler_str) = "Cooler: ";
 
 #elif defined(ITALIAN)
 
 // P(title_str) = "Termostato Web Arduino ";
 const unsigned char zone_names[4][7] PROGMEM = { "Zona 1", "Zona 2", "Zona 3", "Zona 4" };
 const unsigned char weekday_names[7][4] PROGMEM = { "Sab", "Dom", "Lun", "Mar", "Mer", "Gio", "Ven" };
-const unsigned char weekday_names_underlined[7][11] PROGMEM = { "<u>Sab</u>", "<u>Dom</u>", "<u>Lun</u>", "<u>Mar</u>", "<u>Mer</u>", "<u>Gio</u>", "<u>Ven</u>" };
-const unsigned char mode_names[3][8] PROGMEM = { "Inverno", "Estate", "Disatt." };
-const unsigned char mode_names_underlined[3][15] PROGMEM = { "<u>Inverno</u>", "<u>Estate</u>", "<u>Disatt.</u>" };
-P(set_temp_str) = "imposta: ";
-P(actual_temp_str) = "temperatura: ";
-P(on_hour_str) = "ora ON: ";
-P(off_hour_str) = "ora OFF: ";
-P(mode_str) = "modalità: ";
-P(day_str) = "giorno: ";
+const unsigned char mode_names[3][8] PROGMEM = { "Disatt.", "Inverno", "Estate" };
+P(set_temp_str) = "Imposta: ";
+P(actual_temp_str) = "Temperatura: ";
+P(on_hour_str) = "Ora ON: ";
+P(off_hour_str) = "Ora OFF: ";
+P(mode_str) = "Modalità: ";
+P(day_str) = "Giorno: ";
+P(heater_str) = "Caldaia: ";
+P(cooler_str) = "Condizionatore: ";
 
 #endif
 

@@ -67,9 +67,7 @@ const uint8_t ntp_port = 123;
 #define WEBDUINO_PREFIX "/thermostat"				// the page will be available at: http://192.168.0.127/thermostat
 #define LISTENING_PORT 80
 const int NTP_PACKET_SIZE = 48;
-uint8_t ntp_packet_buffer[NTP_PACKET_SIZE];
 EthernetUDP udp_conn;
-WebServer webserver(WEBDUINO_PREFIX, LISTENING_PORT);			// webserver object declaration with listening port (80)
 
 //---------------------------------- Thermostat settings --------------------------------------------------------------------
 #define THERMOSTAT_RESOLUTION 9		// 9=0.5°C, 10=0.25°C, 11=0.125°C, 12=1/16°C resolution of the temperature probes readings, default to 9
@@ -81,7 +79,7 @@ thermostat *zone_2 = new thermostat(ZONE_2_PIN, temp_sensors, probe_2, eeprom_ad
 thermostat *zone_3 = new thermostat(ZONE_3_PIN, temp_sensors, probe_3, eeprom_address_3);		// when measured temp goes over (set_temp + range) the thermostat will be deactivated
 const uint8_t num_thermostats = 4;
 thermostat *thermostats[num_thermostats] = { zone_0, zone_1, zone_2, zone_3 };
-#define CHECK_INTERVAL 1000
+#define CHECK_INTERVAL 2000
 #define HOUR_RESET_INTERVAL 86400000
 #define WEEKDAY_RESET_INTERVAL 60000
 

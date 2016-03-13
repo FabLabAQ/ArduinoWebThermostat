@@ -43,15 +43,15 @@ void thermostat::begin()
 	digitalWrite(_pin, HIGH);
 	_temp_sensors->setResolution(_probe_address, _resolution);
 	mode = EEPROM.read(_eeprom_address);
-	for (uint8_t i=0; i<=6; i++)
+	for (uint8_t i=0; i<7; i++)
 	{
 		_temp[i] = EEPROM.read(_eeprom_address +1 +i);
 	}
-	for (uint8_t i=0; i<=6; i++)
+	for (uint8_t i=0; i<7; i++)
 	{
 		_on_hour[i] = EEPROM.read(_eeprom_address +8 +i);
 	}
-	for (uint8_t i=0; i<=6; i++)
+	for (uint8_t i=0; i<7; i++)
 	{
 		_off_hour[i] = EEPROM.read(_eeprom_address +15 +i);
 	}
@@ -109,18 +109,31 @@ void thermostat::run()
 	_actual_temp = get_actual_temp() * 10;
 	_today = weekday();
 
-	if (hour() >= _on_hour[_today] && hour() < _off_hour[_today])
+	if (mode != 0)
 	{
-		if(_actual_temp > (_temp[_today] + _range))
+		if (hour() >= _on_hour[_today] && hour() < _off_hour[_today])
+		{
+			if(_actual_temp > (_temp[_today] + _range))
+			{
+				if (mode == 1)
+					status = false;
+				else
+					status = true;
+			}
+			else if(_actual_temp < (_temp[_today] - _range))
+			{
+				if (mode == 1)
+					status = true;
+				else
+					status = false;
+			}
+		}
+		else if (hour() >= _off_hour[_today] || hour() < _on_hour[_today])
 		{
 			status = false;
 		}
-		else if(_actual_temp < (_temp[_today] - _range))
-		{
-			status = true;
-		}
 	}
-	else if (hour() >= _off_hour[_today] || hour() < _on_hour[_today])
+	else
 	{
 		status = false;
 	}
