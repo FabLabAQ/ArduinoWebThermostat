@@ -238,7 +238,7 @@ public:
   void checkBox(const char *name, const char *val,
                 const char *label, bool selected);
 
-  void print_button(const char &name, const char *val, const char *label);
+  void print_button(const char &name, const char &val, const unsigned char *label);
 
   // returns next character or -1 if we're at end-of-stream
   int read();
@@ -1275,7 +1275,7 @@ void WebServer::processHeaders()
   }
 }
 
-void WebServer::print_button(const char &name, const char *val, const char *label)
+void WebServer::print_button(const char &name, const char &val, const unsigned char *label)
 {
   // <button name='name' value='value'>label</button>
 
@@ -1289,7 +1289,7 @@ void WebServer::print_button(const char &name, const char *val, const char *labe
   printP(part1);
   print(val);
   printP(part2);
-  print(label);
+  printP(label);
   printP(part3);
 }
 

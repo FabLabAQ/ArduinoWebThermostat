@@ -34,54 +34,68 @@ thermostat::thermostat(uint8_t pin, DallasTemperature *temp_sensors, DeviceAddre
 		_probe_address[i] = probe_address[i];
 	}
 	_eeprom_address = eeprom_address;
-	_status = false;
+	status = false;
 }
 
 void thermostat::begin()
 {
 	pinMode(_pin, OUTPUT);
+	digitalWrite(_pin, HIGH);
 	_temp_sensors->setResolution(_probe_address, _resolution);
-	_temp = EEPROM.read(_eeprom_address);
-	_on_hour = EEPROM.read(_eeprom_address +1);
-	_off_hour = EEPROM.read(_eeprom_address +2);
+	mode = EEPROM.read(_eeprom_address);
+	for (uint8_t i=0; i<=6; i++)
+	{
+		_temp[i] = EEPROM.read(_eeprom_address +1 +i);
+	}
+	for (uint8_t i=0; i<=6; i++)
+	{
+		_on_hour[i] = EEPROM.read(_eeprom_address +8 +i);
+	}
+	for (uint8_t i=0; i<=6; i++)
+	{
+		_off_hour[i] = EEPROM.read(_eeprom_address +15 +i);
+	}
 }
 
-// void thermostat::set_temp(uint8_t temp)
-// {
-// 	_temp = temp;
-// }
-
-void thermostat::change_temp(int8_t increase)
+void thermostat::change_temp(uint8_t day, int8_t increase)
 {
-	_temp += increase;
-	EEPROM.write(_eeprom_address, _temp);
+	_temp[day] += increase;
+	EEPROM.write(_eeprom_address +1 +day, _temp[day]);
 }
 
-void thermostat::change_on_hour(int8_t increase)
+void thermostat::change_on_hour(uint8_t day, int8_t increase)
 {
-	_on_hour += increase;
-	EEPROM.write(_eeprom_address +1, _on_hour);	
+	_on_hour[day] += increase;
+	EEPROM.write(_eeprom_address +8 +day, _on_hour[day]);	
 }
 
-void thermostat::change_off_hour(int8_t increase)
+void thermostat::change_off_hour(uint8_t day, int8_t increase)
 {
-	_off_hour += increase;
-	EEPROM.write(_eeprom_address +2, _off_hour);	
+	_off_hour[day] += increase;
+	EEPROM.write(_eeprom_address +15 +day, _off_hour[day]);	
 }
 
-uint8_t thermostat::get_on_hour()
+void thermostat::change_mode()
 {
-	return _on_hour;
+	mode++;
+	if (mode > 2)
+		mode = 0;
+	EEPROM.write(_eeprom_address, mode);	
 }
 
-uint8_t thermostat::get_off_hour()
+uint8_t thermostat::get_on_hour(uint8_t day)
 {
-	return _off_hour;
+	return _on_hour[day];
 }
 
-float thermostat::get_set_temp()
+uint8_t thermostat::get_off_hour(uint8_t day)
 {
-	return _temp / 10.0;
+	return _off_hour[day];
+}
+
+float thermostat::get_set_temp(uint8_t day)
+{
+	return _temp[day] / 10.0;
 }
 
 float thermostat::get_actual_temp()
@@ -90,30 +104,26 @@ float thermostat::get_actual_temp()
 	return _temp_sensors->getTempC(_probe_address);
 }
 
-bool thermostat::get_status()
-{
-	return _status;
-}
-
 void thermostat::run()
 {
 	_actual_temp = get_actual_temp() * 10;
+	_today = weekday();
 
-	if (hour() >= _on_hour && hour() < _off_hour)
+	if (hour() >= _on_hour[_today] && hour() < _off_hour[_today])
 	{
-		if(_actual_temp > (_temp + _range))
+		if(_actual_temp > (_temp[_today] + _range))
 		{
-			_status = false;
+			status = false;
 		}
-		else if(_actual_temp < (_temp - _range))
+		else if(_actual_temp < (_temp[_today] - _range))
 		{
-			_status = true;
+			status = true;
 		}
 	}
-	else if (hour() >= _off_hour || hour() < _on_hour)
+	else if (hour() >= _off_hour[_today] || hour() < _on_hour[_today])
 	{
-		_status = false;
+		status = false;
 	}
 
-	digitalWrite(_pin, _status);
+	digitalWrite(_pin, !status);		// status inverted because most relay boards work with a low = ON
 }

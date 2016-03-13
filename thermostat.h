@@ -38,19 +38,23 @@ class thermostat
 		thermostat(uint8_t, DallasTemperature*, DeviceAddress, uint8_t);
 		void begin();
 		void run();
-		float get_set_temp();
+
+		void change_temp(uint8_t, int8_t);
+		void change_on_hour(uint8_t, int8_t);
+		void change_off_hour(uint8_t, int8_t);
+		void change_mode();
+
 		float get_actual_temp();
-//		void set_temp(uint8_t);
-		bool get_status();
-		void change_temp(int8_t);
-		void change_on_hour(int8_t);
-		void change_off_hour(int8_t);
-		uint8_t get_on_hour();
-		uint8_t get_off_hour();
+		float get_set_temp(uint8_t);
+		uint8_t get_on_hour(uint8_t);
+		uint8_t get_off_hour(uint8_t);
+
+		uint8_t mode;
+		bool status;
+
 	private:
 		const uint8_t _resolution = THERMOSTAT_RESOLUTION, _range = THERMOSTAT_RANGE;
-		uint8_t _pin, _eeprom_address, _temp, _actual_temp, _on_hour, _off_hour;
-		bool _status;
+		uint8_t _pin, _eeprom_address, _temp[7], _actual_temp, _on_hour[7], _off_hour[7], _today;
 		DallasTemperature *_temp_sensors;
 		DeviceAddress _probe_address;
 };
