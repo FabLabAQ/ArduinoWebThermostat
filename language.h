@@ -23,7 +23,6 @@
 #include "WebServer.h"
 
 P(br) = "<br>";
-P(head) = "<html><head><body>";
 P(tail) = "</body></html>";
 P(form_start) = "<form action='/thermostat' method='POST'>";
 P(form_end) = "</form>";
@@ -34,10 +33,13 @@ P(left) = "<";
 P(on_str) = " ON";
 P(off_str) = " OFF";
 P(double_zero) = ":00 ";
+P(span_end) = "</span>";
+P(head_1) = "<html><head><title>";
+P(head_2) = "</title></head><body>";
 
 #if defined(ENGLISH)
 
-// P(title_str) = "Arduino Web Thermostat ";
+P(title) = "<b>Arduino Web Thermostat</b>";
 const unsigned char zone_names[4][7] PROGMEM = { "Zone 1", "Zone 2", "Zone 3", "Zone 4" };
 const unsigned char weekday_names[7][4] PROGMEM = { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri" };
 const unsigned char mode_names[3][8] PROGMEM = { "Disable", "Winter", "Summer" };
@@ -52,7 +54,7 @@ P(cooler_str) = "Cooler: ";
 
 #elif defined(ITALIAN)
 
-// P(title_str) = "Termostato Web Arduino ";
+P(title) = "<b>Termostato Web Arduino</b>";
 const unsigned char zone_names[4][7] PROGMEM = { "Zona 1", "Zona 2", "Zona 3", "Zona 4" };
 const unsigned char weekday_names[7][4] PROGMEM = { "Sab", "Dom", "Lun", "Mar", "Mer", "Gio", "Ven" };
 const unsigned char mode_names[3][8] PROGMEM = { "Disatt.", "Inverno", "Estate" };

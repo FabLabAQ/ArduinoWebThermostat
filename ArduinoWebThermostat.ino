@@ -32,7 +32,13 @@ WebServer webserver(WEBDUINO_PREFIX, LISTENING_PORT);			// webserver object decl
 
 void print_thermostat_page()
 {
-	webserver.printP(head);
+	webserver.printP(head_1);
+	webserver.printP(title);
+	webserver.printP(head_2);
+	webserver.printP(span_start);
+
+	webserver.printP(title);
+	webserver.printP(br);
 
 	uint8_t weekday_today = weekday();
 	webserver.printP(weekday_names[weekday_today]);
@@ -119,6 +125,7 @@ void print_thermostat_page()
 		webserver.printP(form_end);
 	}
 	
+	webserver.printP(span_end);
 	webserver.printP(tail);
 }
 

@@ -86,6 +86,7 @@ thermostat *thermostats[num_thermostats] = { zone_0, zone_1, zone_2, zone_3 };
 //----------------------------------------------- Language, Font settings ----------------------------------------------------
 #define ENGLISH
 //#define ITALIAN
+P(span_start) = "<span style=\"font-family: verdana; font-size: 16px; color: #000000;\">";
 
 
 #endif

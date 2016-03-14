@@ -1,0 +1,49 @@
+<html>
+<head>
+	<title>Arduino Web Thermostat</title>
+</head>
+<body>
+	<span style="font-family: verdana; font-size: 16px; color: #000000;">
+		Mon 10:26<br>
+		Heater:  OFF<br>
+		Cooler:  OFF<br>
+		<br>
+		<form action="/thermostat" method="POST">
+			Zone 1 OFF<br>
+			Mode: <button name="0" value="0"> Winter </button><br>
+			Actual temp: 19.50°C<br>
+			Day: <button name="0" value="1"> &lt; </button>Sat<button name="0" value="2"> &gt; </button><br>
+			Set: <button name="0" value="3"> - </button>2.20°C<button name="0" value="4"> + </button><br>
+			ON hour: <button name="0" value="5"> - </button>16:00 <button name="0" value="6"> + </button><br>
+			OFF hour: <button name="0" value="7"> - </button>0:00 <button name="0" value="8"> + </button>
+		</form>
+		<form action="/thermostat" method="POST">
+			Zone 2 OFF<br>
+			Mode: <button name="1" value="0"> Disable </button><br>
+			Actual temp: 19.00°C<br>
+			Day: <button name="1" value="1"> &lt; </button>Sat<button name="1" value="2"> &gt; </button><br>
+			Set: <button name="1" value="3"> - </button>24.50°C<button name="1" value="4"> + </button><br>
+			ON hour: <button name="1" value="5"> - </button>0:00 <button name="1" value="6"> + </button><br>
+			OFF hour: <button name="1" value="7"> - </button>0:00 <button name="1" value="8"> + </button>
+		</form>
+		<form action="/thermostat" method="POST">
+			Zone 3 OFF<br>
+			Mode: <button name="2" value="0"> Disable </button><br>
+			Actual temp: 19.00°C<br>
+			Day: <button name="2" value="1"> &lt; </button>Sat<button name="2" value="2"> &gt; </button><br>
+			Set: <button name="2" value="3"> - </button>24.00°C<button name="2" value="4"> + </button><br>
+			ON hour: <button name="2" value="5"> - </button>0:00 <button name="2" value="6"> + </button><br>
+			OFF hour: <button name="2" value="7"> - </button>1:00 <button name="2" value="8"> + </button>
+		</form>
+		<form action="/thermostat" method="POST">
+			Zone 4 OFF<br>
+			Mode: <button name="3" value="0"> Disable </button><br>
+			Actual temp: 19.00°C<br>
+			Day: <button name="3" value="1"> &lt; </button>Sat<button name="3" value="2"> &gt; </button><br>
+			Set: <button name="3" value="3"> - </button>23.50°C<button name="3" value="4"> + </button><br>
+			ON hour: <button name="3" value="5"> - </button>1:00 <button name="3" value="6"> + </button><br>
+			OFF hour: <button name="3" value="7"> - </button>1:00 <button name="3" value="8"> + </button>
+		</form>
+	</span>
+</body>
+</html>
