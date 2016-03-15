@@ -318,11 +318,10 @@ void loop()
 
 	if (millis() > prevMillis_3 +HOUR_RESET_INTERVAL)
 	{
-		while (getNTPtime() == 0)			// to prevent unwanted activation based on wrong time
+		if (getNTPtime() != 0)			// to prevent unwanted activation based on wrong time
 		{
-			delay(1000);
+			setSyncProvider(getNTPtime);
 		}
-		setSyncProvider(getNTPtime);
 		prevMillis_3 = millis();
 	}
 
