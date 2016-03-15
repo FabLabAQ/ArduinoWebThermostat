@@ -1,0 +1,21 @@
+username: barcincin
+password: meristeno28
+codificati: YmFyY2luY2luOm1lcmlzdGVubzI4
+
+indirizzo ip: 192.168.1.127
+
+indirizzi sonde
+
+sonda 1: 28 FF 0E 8E A1 15 03 8A
+
+sonda 2: 28 FF 9D 97 A1 15 04 5B
+
+sonda 3: 28 FF A1 AA 91 15 04 F5
+
+sonda 4: 28 FF 6A AD A1 15 03 7C
+
+nomi: const unsigned char zone_names[4][7] PROGMEM = { "BAR", "CUCINA", "GIOCHI", "GAZEBO" };
+
+P(form_start) = "<form action='/cincin' method='POST'>";
+
+P(title) = "Termostato Bar CinCin";

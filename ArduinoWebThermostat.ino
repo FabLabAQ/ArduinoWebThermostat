@@ -23,6 +23,7 @@
 #include "SPI.h"
 #include "Ethernet.h"
 #include "OneWire.h"
+#include "EEPROM.h"
 
 uint8_t ntp_packet_buffer[NTP_PACKET_SIZE];
 int8_t thermostat_day[num_thermostats];
