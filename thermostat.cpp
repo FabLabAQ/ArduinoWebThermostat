@@ -66,12 +66,20 @@ void thermostat::change_temp(uint8_t day, int8_t increase)
 void thermostat::change_on_hour(uint8_t day, int8_t increase)
 {
 	_on_hour[day] += increase;
+	if (_on_hour[day] > 24)
+		_on_hour[day] = 0;
+	else if (_on_hour[day] < 0)
+		_on_hour[day] = 24;
 	EEPROM.write(_eeprom_address +8 +day, _on_hour[day]);	
 }
 
 void thermostat::change_off_hour(uint8_t day, int8_t increase)
 {
 	_off_hour[day] += increase;
+	if (_off_hour[day] > 24)
+		_off_hour[day] = 0;
+	else if (_off_hour[day] < 0)
+		_off_hour[day] = 24;
 	EEPROM.write(_eeprom_address +15 +day, _off_hour[day]);	
 }
 
@@ -95,7 +103,7 @@ uint8_t thermostat::get_off_hour(uint8_t day)
 
 float thermostat::get_set_temp(uint8_t day)
 {
-	return _temp[day] / 10.0;
+	return _temp[day] / 4.0;
 }
 
 float thermostat::get_actual_temp()
@@ -106,7 +114,7 @@ float thermostat::get_actual_temp()
 
 void thermostat::run()
 {
-	_actual_temp = get_actual_temp() * 10;
+	_actual_temp = get_actual_temp() * 4;
 	_today = weekday();
 
 	if (mode != 0)

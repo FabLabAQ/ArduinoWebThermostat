@@ -38,7 +38,7 @@ const uint8_t ZONE_2_PIN = 5;
 const uint8_t ZONE_3_PIN = 6;
 const uint8_t HEATER_PIN = 7;
 const uint8_t COOLER_PIN = 8;
-const uint8_t THERM_INCREMENTS = 5;		// 0.50 °C, the increment in set temperature when clicking on + or -
+const uint8_t THERM_INCREMENTS = 2;		// 0.50 °C, the increment in set temperature when clicking on + or -
 const uint8_t eeprom_address_0 = 0;
 const uint8_t eeprom_address_1 = eeprom_address_0 +22;
 const uint8_t eeprom_address_2 = eeprom_address_1 +22;
@@ -70,8 +70,8 @@ const int NTP_PACKET_SIZE = 48;
 EthernetUDP udp_conn;
 
 //---------------------------------- Thermostat settings --------------------------------------------------------------------
-#define THERMOSTAT_RESOLUTION 9		// 9=0.5°C, 10=0.25°C, 11=0.125°C, 12=1/16°C resolution of the temperature probes readings, default to 9
-#define THERMOSTAT_RANGE 2			// 0.20 °C, the range around the actual temperature in which the thermostat will be acting, default to 1
+#define THERMOSTAT_RESOLUTION 10	// 9=0.5°C, 10=0.25°C, 11=0.125°C, 12=1/16°C resolution of the temperature probes readings, default to 9
+#define THERMOSTAT_RANGE 1			// 0.50 °C, the range around the actual temperature in which the thermostat will be acting, default to 1
 #include "thermostat.h"
 thermostat *zone_0 = new thermostat(ZONE_0_PIN, temp_sensors, probe_0, eeprom_address_0);		// pin connected to the relay, temperature sensors object pointer, 
 thermostat *zone_1 = new thermostat(ZONE_1_PIN, temp_sensors, probe_1, eeprom_address_1);		// probe address, desired reading resolution, activation temperature range.

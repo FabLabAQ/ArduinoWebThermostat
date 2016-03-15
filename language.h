@@ -30,16 +30,16 @@ P(plus) = "+";
 P(minus) = "-";
 P(right) = ">";
 P(left) = "<";
-P(on_str) = " ON";
-P(off_str) = " OFF";
+P(on_str) = ": ON";
+P(off_str) = ": OFF";
 P(double_zero) = ":00 ";
 P(span_end) = "</span>";
 P(head_1) = "<html><head><title>";
-P(head_2) = "</title></head><body>";
+P(head_2) = "</title><meta http-equiv=\"refresh\" content=\"60\" ></head><body>";
 
 #if defined(ENGLISH)
 
-P(title) = "<b>Arduino Web Thermostat</b>";
+P(title) = "Arduino Web Thermostat";
 const unsigned char zone_names[4][7] PROGMEM = { "Zone 1", "Zone 2", "Zone 3", "Zone 4" };
 const unsigned char weekday_names[7][4] PROGMEM = { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri" };
 const unsigned char mode_names[3][8] PROGMEM = { "Disable", "Winter", "Summer" };
@@ -49,12 +49,12 @@ P(on_hour_str) = "ON hour: ";
 P(off_hour_str) = "OFF hour: ";
 P(mode_str) = "Mode: ";
 P(day_str) = "Day: ";
-P(heater_str) = "Heater: ";
-P(cooler_str) = "Cooler: ";
+P(heater_str) = "Heater";
+P(cooler_str) = "Cooler";
 
 #elif defined(ITALIAN)
 
-P(title) = "<b>Termostato Web Arduino</b>";
+P(title) = "Termostato Web Arduino";
 const unsigned char zone_names[4][7] PROGMEM = { "Zona 1", "Zona 2", "Zona 3", "Zona 4" };
 const unsigned char weekday_names[7][4] PROGMEM = { "Sab", "Dom", "Lun", "Mar", "Mer", "Gio", "Ven" };
 const unsigned char mode_names[3][8] PROGMEM = { "Disatt.", "Inverno", "Estate" };
@@ -64,8 +64,8 @@ P(on_hour_str) = "Ora ON: ";
 P(off_hour_str) = "Ora OFF: ";
 P(mode_str) = "Modalità: ";
 P(day_str) = "Giorno: ";
-P(heater_str) = "Caldaia: ";
-P(cooler_str) = "Condizionatore: ";
+P(heater_str) = "Caldaia";
+P(cooler_str) = "Condizionatore";
 
 #endif
 

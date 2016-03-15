@@ -25,7 +25,7 @@
 #include "DallasTemperature.h"
 
 #ifndef THERMOSTAT_RESOLUTION
-#define THERMOSTAT_RESOLUTION 9
+#define THERMOSTAT_RESOLUTION 10
 #endif // #ifndef THERMOSTAT_RESOLUTION
 
 #ifndef THERMOSTAT_RANGE
@@ -54,7 +54,8 @@ class thermostat
 
 	private:
 		const uint8_t _resolution = THERMOSTAT_RESOLUTION, _range = THERMOSTAT_RANGE;
-		uint8_t _pin, _eeprom_address, _temp[7], _actual_temp, _on_hour[7], _off_hour[7], _today;
+		uint8_t _temp[7], _pin, _eeprom_address, _today;
+		int8_t _on_hour[7], _off_hour[7], _actual_temp;
 		DallasTemperature *_temp_sensors;
 		DeviceAddress _probe_address;
 };
