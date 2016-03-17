@@ -1,0 +1,146 @@
+<html>
+<head>
+	<title>Arduino Web Thermostat</title>
+	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+</head>
+<body>
+	<span style="font-family: verdana; font-size: 16px; color: #000000;">
+	<style scoped>.button-xsmall {font-size: 70%;}</style>
+		Mon 10:26<br>
+		Heater:  <b>OFF</b><br/>
+		Cooler:  <b>OFF</b><br/>
+		<br>
+		<form action="/thermostat" method="POST" class="pure-form pure-form-aligned">
+		    <legend>Zone 1 <b>OFF</b></legend>
+			<div class="pure-control-group">
+				<label for="mode">Mode: </label> 
+				<button name="0" value="0"> Winter </button>
+			</div>
+			<div class="pure-control-group">
+				<label for="temp">Actual temp:</label> 
+				<id name="temp"> 19.50&#8451;</id>
+			</div>
+			<div class="pure-control-group">
+				<label for="0">Day:</label>
+				<button name="0" value="1" class="button-xsmall pure-button"><i class="fa fa-calendar-minus-o"></i></button>
+				&nbsp;Sat&nbsp;
+				<button name="0" value="2" class="button-xsmall pure-button"><i class="fa fa-calendar-plus-o"></i></button>
+			</div>
+
+			<div class="pure-control-group">
+				<label for="0">Set:</label>
+				<button name="0" value="3" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>
+				2.20&#8451;
+				<button name="0" value="4" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+			</div>
+			
+			<div class="pure-control-group">
+				<label for="0">ON hour:</label>
+				<button name="0" value="5" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>
+				16:00
+				<button name="0" value="7" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+			</div>
+			
+			<div class="pure-control-group">
+				<label for="0">OFF hour:</label>
+				<button name="0" value="6" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>
+				00:00
+				<button name="0" value="7" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+			</div>
+		</form>
+		
+		
+		<form action="/thermostat" method="POST" class="pure-form pure-form-aligned">
+		    <legend>Zone 2 <b>OFF</b></legend>
+			<div class="pure-control-group">
+				<label for="mode">Mode: </label> 
+				<button name="1" value="0"> Disable </button>
+			</div>
+			<div class="pure-control-group">
+				<label for="temp">Actual temp:</label> 
+				<id name="temp"> 19.00&#8451;</id>
+			</div>
+			<div class="pure-control-group">
+				<label for="1">Day:</label>
+				<button name="1" value="1" class="button-xsmall pure-button"><i class="fa fa-calendar-minus-o"></i></button>
+				&nbsp;Sat&nbsp;
+				<button name="1" value="2" class="button-xsmall pure-button"><i class="fa fa-calendar-plus-o"></i></button>
+			</div>
+
+			<div class="pure-control-group">
+				<label for="1">Set:</label>
+				<button name="1" value="3" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>
+				24.50&#8451;
+				<button name="1" value="4" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+			</div>
+			
+			<div class="pure-control-group">
+				<label for="1">ON hour:</label>
+				<button name="1" value="5" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>
+				00:00
+				<button name="1" value="7" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+			</div>
+			
+			<div class="pure-control-group">
+				<label for="1">OFF hour:</label>
+				<button name="1" value="6" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>
+				00:00
+				<button name="1" value="7" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+			</div>
+		</form>
+		
+
+		<form action="/thermostat" method="POST" class="pure-form pure-form-aligned">
+		    <legend>Zone 3 <b>OFF</b> (TEST ALLINEAMENTO PULSANTI PRIMA DEL TESTO)</legend>
+			<div class="pure-control-group">
+				<label for="mode">Mode: </label> 
+				<button name="2" value="0"> Disable </button>
+			</div>
+			<div class="pure-control-group">
+				<label for="temp">Actual temp:</label> 
+				<id name="temp"> 19.00&#8451;</id>
+			</div>
+			<div class="pure-control-group">
+				<label for="2">Day:</label>
+				<button name="2" value="2" class="button-xsmall pure-button"><i class="fa fa-calendar-minus-o"></i></button>
+				<button name="2" value="2" class="button-xsmall pure-button"><i class="fa fa-calendar-plus-o"></i></button>
+				Sat
+			</div>
+
+			<div class="pure-control-group">
+				<label for="2">Set:</label>
+				<button name="2" value="3" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>				
+				<button name="2" value="4" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+				24.00&#8451;
+			</div>
+			
+			<div class="pure-control-group">
+				<label for="2">ON hour:</label>
+				<button name="2" value="5" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>				
+				<button name="2" value="7" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+				00:00
+			</div>
+			
+			<div class="pure-control-group">
+				<label for="2">OFF hour:</label>
+				<button name="2" value="6" class="button-xsmall pure-button"><i class="fa fa-minus"></i></button>
+				<button name="2" value="7" class="button-xsmall pure-button"><i class="fa fa-plus"></i></button>
+				00:00
+			</div>
+		</form>		
+		
+ <div> segue il layout originale</div>
+		<form action="/thermostat" method="POST" class="pure-form">
+			Zone 4 OFF<br>
+			Mode: <button name="3" value="0"> Disable </button><br>
+			Actual temp: 19.00&#8451;<br>
+			Day: <button name="3" value="1"> &lt; </button>Sat<button name="3" value="2"> &gt; </button><br>
+			Set: <button name="3" value="3"> - </button>23.50&#8451;<button name="3" value="4"> + </button><br>
+			ON hour: <button name="3" value="5"> - </button>1:00 <button name="3" value="6"> + </button><br>
+			OFF hour: <button name="3" value="7"> - </button>1:00 <button name="3" value="8"> + </button>
+		</form>
+	</span>
+</body>
+</html>

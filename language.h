@@ -22,7 +22,7 @@
 
 #include "WebServer.h"
 
-P(br) = "<br>";
+P(br) = "<br/>";
 P(tail) = "</body></html>";
 P(form_start) = "<form action='/thermostat' method='POST'>";
 P(form_end) = "</form>";
