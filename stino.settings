@@ -4,7 +4,7 @@
     "board": 0, 
     "full_compilation": true, 
     "line_ending": 1, 
-    "platform": 1, 
+    "platform": 2, 
     "platform_name": "Arduino AVR Boards", 
     "serial_port": 0, 
     "verify_code": true
