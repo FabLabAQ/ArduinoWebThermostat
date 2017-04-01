@@ -35,7 +35,7 @@
 class thermostat
 {
 	public:
-		thermostat(uint8_t, DallasTemperature*, DeviceAddress, uint8_t);
+		thermostat(uint8_t, DallasTemperature*, uint8_t*, uint8_t);
 		void begin();
 		void run();
 
@@ -57,7 +57,7 @@ class thermostat
 		uint8_t _temp[7], _pin, _eeprom_address, _today;
 		int8_t _on_hour[7], _off_hour[7], _actual_temp;
 		DallasTemperature *_temp_sensors;
-		DeviceAddress _probe_address;
+		uint8_t *_probe_address;
 };
 
 #endif

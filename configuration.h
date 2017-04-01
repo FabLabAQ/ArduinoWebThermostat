@@ -47,16 +47,16 @@ const uint8_t eeprom_address_3 = eeprom_address_2 +22;
 //------------------------------- temperature probes addresses -----------------------------
 OneWire oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature *temp_sensors = new DallasTemperature(&oneWire);				// poiter to the temperature sensors object, 
-DeviceAddress probe_0 = { 0x28, 0xFF, 0x0E, 0x8E, 0xA1, 0x15, 0x03, 0x8A };		// to be passed in to the thermostat objects, requires OneWire object
-DeviceAddress probe_1 = { 0x28, 0xFF, 0x9D, 0x97, 0xA1, 0x15, 0x04, 0x5B };		// use an address finder sketch to find each probe address
-DeviceAddress probe_2 = { 0x28, 0xFF, 0xA1, 0xAA, 0x91, 0x15, 0x04, 0xF5 };
-DeviceAddress probe_3 = { 0x28, 0xFF, 0x6A, 0xAD, 0xA1, 0x15, 0x03, 0x7C };
+const uint8_t probe_0[8] = { 0x28, 0xFF, 0xC8, 0x92, 0x00, 0x16, 0x02, 0x48 };		// to be passed in to the thermostat objects, requires OneWire object
+const uint8_t probe_1[8] = { 0x28, 0xFF, 0xC7, 0x69, 0x00, 0x16, 0x01, 0x20 };		// use an address finder sketch to find each probe address
+const uint8_t probe_2[8] = { 0x28, 0xFF, 0xAC, 0x7D, 0x00, 0x16, 0x01, 0x77 };
+const uint8_t probe_3[8] = { 0x28, 0xFF, 0x39, 0x7E, 0x00, 0x16, 0x01, 0x9A };
 
 //----------------- IP settings, time zone, NTP -------------------------------------
 static uint8_t arduino_mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };		// set the ethernet shield MAC address here
-static uint8_t arduino_ip[] = { 192, 168, 0, 127 };							// set the static IP address here
+static uint8_t arduino_ip[] = { 10, 42, 0, 127 };							// set the static IP address here
 static char ntp_server_address[] = "ntp.ien.it";							// NTP server address
-const int8_t time_zone = 1;
+const int8_t time_zone = 2;
 const uint8_t ntp_port = 123;
 
 //--------------------------------- Webserver settings ----------------------------------------------------
@@ -84,8 +84,8 @@ thermostat *thermostats[num_thermostats] = { zone_0, zone_1, zone_2, zone_3 };
 #define WEEKDAY_RESET_INTERVAL 60000
 
 //----------------------------------------------- Language, Font settings ----------------------------------------------------
-#define ENGLISH
-//#define ITALIAN
+//#define ENGLISH
+#define ITALIAN
 P(span_start) = "<span style=\"font-family: verdana; font-size: 16px; color: #000000;\">";
 
 

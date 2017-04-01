@@ -25,14 +25,11 @@
 #include "EEPROM.h"
 #include "TimeLib.h"
 
-thermostat::thermostat(uint8_t pin, DallasTemperature *temp_sensors, DeviceAddress probe_address, uint8_t eeprom_address)
+thermostat::thermostat(uint8_t pin, DallasTemperature *temp_sensors, uint8_t *probe_address, uint8_t eeprom_address)
 {
 	_pin = pin;
 	_temp_sensors = temp_sensors;
-	for (uint8_t i = 0; i < 8; ++i)
-	{
-		_probe_address[i] = probe_address[i];
-	}
+	_probe_address = probe_address;
 	_eeprom_address = eeprom_address;
 	status = false;
 }
